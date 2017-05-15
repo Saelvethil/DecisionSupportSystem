@@ -1,0 +1,292 @@
+﻿<Window x:Class="DecisionSupportSystem.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DecisionSupportSystem"
+        mc:Ignorable="d"
+        Title="Decision Support System" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <!--<MenuItem Header="File">-->
+                <MenuItem Header="Open File..." Click="LoadFile_Click"/>
+                <!--<MenuItem Header="Open Excel File..." Click="LoadExcelFile_Click"/>-->
+                <MenuItem Header="Save File..." Click="SaveFile_Click"/>
+            <!--</MenuItem>-->
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <DataGrid Name="DataGridMain" RowBackground="LightSteelBlue" AlternatingRowBackground="LightSkyBlue" ItemsSource="{Binding Data, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      AutoGenerateColumns="True"
+                      ScrollViewer.CanContentScroll="True" 
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="LightSteelBlue">
+
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="ContextMenu"
+                    Value="{StaticResource DataGridColumnHeaderContextMenu}" />
+                    </Style>
+                </DataGrid.Resources>
+            </DataGrid>
+
+            <ScrollViewer Grid.Column="1" Width="auto">
+                <StackPanel >
+                    <ProgressBar Minimum="0" Maximum="100" Name="progressBar" Visibility="Collapsed" Height="25"/>
+                    
+                    <GroupBox Margin="5" Header="Column Removal">
+                        <StackPanel Margin="3">
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="To Remove" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AllColumnsValues}" SelectedValue="{Binding SelectedRemovalColumn, Mode=TwoWay}" />
+                            </Grid>
+                            <Button Margin="3" Content="Remove Column" Click="RemoveColumn_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Binary Classification">
+                        <StackPanel Margin="3">
+                            <Button Margin="3" Content="Process Data" Click="ProcessBinary_Click"/>
+                            <Button Margin="3" Content="Visualize" Click="VisualizeBinary_Click"/>
+                            <Button Margin="3" Content="Classificate Object" Click="ClassificateBinary_Click"/>
+                            <Button Margin="3" Content="Save Data To File" Click="SaveBinary_Click"/>
+                            <Button Margin="3" Content="Save Ignored Data To File" Click="SaveBinaryIgnored_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+                    
+                    <GroupBox Margin="5" Header="Discretization/Normalization">
+                        <StackPanel Margin="3">
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Margin="0,0,5,0"  Content="Selected" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AxisValues}" SelectedValue="{Binding SelectedDiscr, Mode=TwoWay}"></ComboBox>
+                            </Grid>
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Margin="0,0,5,0"  Content="Discretization Interval Count" />
+                                <TextBox Grid.Column="1" Name="DiscretizeTextBox"/>
+                            </Grid>
+
+                            <Button Margin="3" Content="Discretize" Click="DiscretizeButton_Click"/>
+                            <Button Margin="3" Content="Normalize" Click="NormalizeButton_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Discretization/Normalization All">
+                        <StackPanel Margin="3">
+                            <Button  Margin="3" Content="Discretize All" Click="DiscretizeAllButton_Click"/>
+                            <Button Margin="3" Content="Normalize All" Click="NormalizeAllButton_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Class Conversion">
+                        <StackPanel Margin="3">
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Margin="0,0,5,0"  Content="Selected Class" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding StringClassValues}" SelectedValue="{Binding SelectedStringClassValue, Mode=TwoWay}"></ComboBox>
+                            </Grid>
+                            <Button Margin="3" Content="Convert Class" Click="ConvertClassButton_Click"/>
+                            <Button Margin="3" Content="Convert All" Click="ConvertAllButton_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Chart">
+                        <StackPanel>
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Axis X"></Label>
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AxisValues}" SelectedValue="{Binding SelectedX, Mode=TwoWay}"></ComboBox>
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Axis Y"></Label>
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AxisValues}" SelectedValue="{Binding SelectedY, Mode=TwoWay}"></ComboBox>
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Class to Mark"></Label>
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding ClassValues}" SelectedValue="{Binding SelectedClass, Mode=TwoWay}"></ComboBox>
+                            </Grid>
+
+                            <Button Margin="3" Content="2D Chart" Click="Chart2D_Click"></Button>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Classification">
+                        <StackPanel>
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Classification Column" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AllColumnsValues}" SelectedValue="{Binding SelectedClassificationColumn, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Metric" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding Metrics}" SelectedValue="{Binding SelectedClassificationMethod, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Neighbour Count" />
+                                <TextBox Grid.Column="1" Name="ClassificationNeighbourCount" InputScope="Number"/>
+                            </Grid>
+
+                            <Button Margin="3" Content="Classificate" Click="Classificate_Click"></Button>
+                            <Button Margin="3" Content="Classification Quality" Click="CheckClassificationQuality_Click"></Button>
+                            <Button Margin="3" Content="Classification Quality Chart" Click="CheckClassificationQualityChart_Click"></Button>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Clustering">
+                        <StackPanel>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Metric" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding Metrics}" SelectedValue="{Binding SelectedMetric, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Class Count" />
+                                <TextBox Grid.Column="1" Name="ClusteringClassCount" InputScope="Number"/>
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Iterations Count" />
+                                <TextBox Grid.Column="1" Name="IterationsCount" InputScope="Number"/>
+                            </Grid>
+
+                            <Button Margin="3" Content="Clustering" Click="Clustering_Click"></Button>
+                            <!--<Button Margin="3" Content="Clustering Optimal" Click="Clustering_Optimal_Click"></Button>-->
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Similarity">
+                        <StackPanel>
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Clustering Column 1" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AxisValues}" SelectedValue="{Binding SelectedSimilarityColumn1, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Clustering Column 2" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AxisValues}" SelectedValue="{Binding SelectedSimilarityColumn2, Mode=TwoWay}" />
+                            </Grid>
+
+                            <!--<Button Margin="3" Content="Compare Classes" Click="CompareClasses_Click"></Button>-->
+                            
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Method" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding SimilarityMeasures}" SelectedValue="{Binding SelectedSimilarityMeasure, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Button Margin="3" Content="Calculate Similarity" Click="CalculateSimilarity_Click"></Button>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="5" Header="Decision Tree">
+                        <StackPanel>
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Margin="0,0,5,0"  Content="Data Discretization Interval Count" />
+                                <TextBox Grid.Column="1" Name="TreeDiscretizationTextBox"/>
+                            </Grid>
+                            
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Classification Column" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding AllColumnsValues}" SelectedValue="{Binding SelectedClassificationColumn, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Method" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding DecisionTreeMethods}" SelectedValue="{Binding SelectedDecisionTreeMethod, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Button Margin="3" Content="Tree Classification Quality" Click="CheckTreeClassificationQuality_Click"></Button>
+                        </StackPanel>
+                    </GroupBox>
+
+                </StackPanel>
+            </ScrollViewer>
+           
+        </Grid>
+    </Grid>
+</Window>
